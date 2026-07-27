@@ -1,0 +1,90 @@
+project:
+  name: edg-graphrag
+  log_dir: experiments/logs
+  report_dir: experiments/reports
+
+model_profiles:
+  qwen3_4b_local:
+    provider: ollama
+    model: qwen3:4b
+    base_url: http://localhost:11434
+    temperature: 0.1
+    timeout_seconds: 600
+    max_context_tokens: 8192
+  a4_glm4_9b_local:
+    provider: ollama
+    model: glm4:9b
+    base_url: http://localhost:11434
+    temperature: 0.0
+    timeout_seconds: 600
+    max_context_tokens: 4096
+
+shared_backbones:
+  m1_qwen3_4b:
+    model_profile: qwen3_4b_local
+    hf_base_model: Qwen/Qwen3-4B
+    hf_home: ${HF_HOME}
+    roles: [a1, a3]
+    activation_rule: one_adapter_per_request
+    base_model_training: frozen
+
+lora_adapters:
+  a1_extractor:
+    backbone: m1_qwen3_4b
+    role: a1
+    status: formal_training_complete
+    training_target: evidence packet to graph candidates
+    output_dir: ${A1_ADAPTER_PATH}
+  a3_reporter:
+    backbone: m1_qwen3_4b
+    role: a3
+    status: formal_training_complete
+    training_target: accepted subgraph and evidence to canonical report
+    output_dir: ${A3_ADAPTER_PATH}
+
+agents:
+  a1:
+    display_name: A1 graph candidate extractor
+    model_profile: qwen3_4b_local
+    backbone: m1_qwen3_4b
+    adapter: a1_extractor
+    role_mode: adapter_ready_single_gpu
+    sandbox:
+      read: [input.evidence, ontology, prompt.a1]
+      write: [blackboard.claim_candidates, audit.a1]
+      deny: [baseline.kg.write, knowledge_graph.fact_write, report.final_write]
+  a2:
+    display_name: A2 deterministic quality controller
+    model_profile: null
+    sandbox:
+      read: [blackboard.claim_candidates, ontology, provenance]
+      write: [blackboard.quality_results, audit.a2]
+      deny: [baseline.kg.write, knowledge_graph.fact_write, report.final_write]
+  a3:
+    display_name: A3 evidence-bound report generator
+    model_profile: qwen3_4b_local
+    backbone: m1_qwen3_4b
+    adapter: a3_reporter
+    role_mode: adapter_ready_single_gpu
+    sandbox:
+      read: [blackboard.quality_results, input.evidence, retrieval.context, prompt.a3]
+      write: [blackboard.diagnosis_drafts, audit.a3]
+      deny: [baseline.kg.write, knowledge_graph.fact_write, report.final_write]
+  a4:
+    display_name: A4 local adjudicator
+    model_profile: a4_glm4_9b_local
+    sandbox:
+      read: [blackboard.diagnosis_drafts, input.evidence, blackboard.quality_results]
+      write: [blackboard.review_results, audit.a4]
+      deny: [baseline.kg.write, knowledge_graph.fact_write, report.final_write, model.training_write]
+
+infrastructure:
+  workflow_orchestrator:
+    owner: non_llm_state_machine
+    implementation: src/agent_kg/orchestration/orchestrator.py
+  report_builder:
+    owner: non_llm_orchestrator
+  audit_logger:
+    owner: non_llm_orchestrator
+  fact_kg_writer:
+    owner: external_transactional_tool
