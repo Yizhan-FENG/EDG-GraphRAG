@@ -1,0 +1,86 @@
+version: "public-0.1"
+
+thresholds:
+  reject_confidence: 0.15
+  hold_confidence: 0.35
+
+entity_types:
+  - source_audited_case
+  - equipment_or_component
+  - fault_mechanism_or_condition
+  - operating_parameter
+  - protection_or_outcome
+  - corrective_action
+  - control_or_information_system
+  - technical_concept
+
+predicate_aliases:
+  documents_entity: [documents_entity]
+  has_operating_parameter_state: [has_operating_parameter_state]
+  has_defect: [has_defect]
+  causes: [causes, cause, "导致", "瀵艰嚧"]
+  triggers: [triggers]
+  damages: [damages]
+  mitigates: [mitigates]
+  blocks: [blocks]
+  related_to: [related_to]
+  associated_with: [associated_with]
+
+relation_constraints:
+  documents_entity:
+    subject_types: [source_audited_case]
+    object_types: ["*"]
+    diagnostic_relation: false
+  has_defect:
+    subject_types: [equipment_or_component]
+    object_types: [fault_mechanism_or_condition]
+    diagnostic_relation: true
+  has_operating_parameter_state:
+    subject_types: [equipment_or_component]
+    object_types: [operating_parameter]
+    diagnostic_relation: true
+  causes:
+    subject_types:
+      - equipment_or_component
+      - fault_mechanism_or_condition
+      - operating_parameter
+      - protection_or_outcome
+      - control_or_information_system
+      - technical_concept
+    object_types:
+      - equipment_or_component
+      - fault_mechanism_or_condition
+      - operating_parameter
+      - protection_or_outcome
+      - control_or_information_system
+      - technical_concept
+    diagnostic_relation: true
+  triggers:
+    subject_types: ["*"]
+    object_types: ["*"]
+    diagnostic_relation: true
+  damages:
+    subject_types: ["*"]
+    object_types: [equipment_or_component]
+    diagnostic_relation: true
+  mitigates:
+    subject_types: [corrective_action, control_or_information_system]
+    object_types: ["*"]
+    diagnostic_relation: true
+  blocks:
+    subject_types: [corrective_action, control_or_information_system, fault_mechanism_or_condition, technical_concept]
+    object_types: ["*"]
+    diagnostic_relation: true
+  related_to:
+    subject_types: ["*"]
+    object_types: ["*"]
+    diagnostic_relation: false
+  associated_with:
+    subject_types: ["*"]
+    object_types: ["*"]
+    diagnostic_relation: false
+
+cycle_sensitive_predicates: [causes, triggers, damages]
+
+evidence_fidelity:
+  fault_cues: ["crack", "leakage", "failure", "fault", "裂纹", "泄漏", "短路", "瑁傜汗"]
