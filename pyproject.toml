@@ -1,0 +1,47 @@
+[project]
+name = "edg-graphrag"
+version = "0.1.0"
+description = "Evidence-constrained multi-agent GraphRAG for auditable technical incident analysis"
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+license = {text = "MIT"}
+dependencies = [
+    "httpx>=0.28.0",
+    "pydantic>=2.0.0",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.urls]
+Repository = "https://github.com/Yizhan-FENG/EDG-GraphRAG"
+Issues = "https://github.com/Yizhan-FENG/EDG-GraphRAG/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.8.0",
+]
+train = [
+    "accelerate>=1.12.0",
+    "bitsandbytes>=0.49.0",
+    "datasets>=4.0.0",
+    "huggingface-hub>=0.34.0",
+    "peft>=0.18.0",
+    "safetensors>=0.5.0",
+    "torch>=2.9.0",
+    "transformers>=5.0.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agent_kg"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[build-system]
+requires = ["hatchling>=1.27.0"]
+build-backend = "hatchling.build"
