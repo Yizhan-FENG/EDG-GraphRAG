@@ -175,8 +175,3 @@ creating an issue.
 本仓库只公开核心代码、安装方法、配置模板、测试和可复现实验流程。原始数据、
 微调数据、知识图谱导出、模型权重、LoRA、逐案例日志、实验中间结果以及论文正文
 和配图均未上传。A4 的本地模型审议属于“模型代理评审”，不能表述为人工专家金标准。
-
-## License
-
-Code is released under the [MIT License](LICENSE). Dataset and model licenses
-are separate and remain the responsibility of their respective owners.
