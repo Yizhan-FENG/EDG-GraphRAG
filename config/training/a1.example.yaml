@@ -1,0 +1,23 @@
+role: a1
+adapter_name: a1_extractor
+base_model: Qwen/Qwen3-4B
+hf_home: ${HF_HOME}
+output_dir: experiments/adapters/a1_extractor
+catalog: /absolute/path/to/private/training_catalog.json
+train_sources:
+  user_dataset: 1.0
+max_length: 1536
+seed: 20260723
+learning_rate: 0.0002
+weight_decay: 0.01
+warmup_ratio: 0.05
+total_steps: 160
+segment_steps: 20
+validation_max_rows: 32
+evaluate_at_segment_end: true
+lora_r: 8
+lora_alpha: 16
+lora_dropout: 0.05
+load_in_4bit: true
+gradient_checkpointing: true
+
