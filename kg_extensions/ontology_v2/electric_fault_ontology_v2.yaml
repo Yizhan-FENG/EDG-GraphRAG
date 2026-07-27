@@ -1,0 +1,72 @@
+version: "2.0.0-draft"
+scope: "电力设备故障诊断、证据约束 GraphRAG 与多智能体审计"
+principles:
+  - "对象、状态/事件、证据三层分离"
+  - "因果关系必须有方向、证据和工况限定"
+  - "旧图谱只读；迁移事实先进入候选层"
+
+entity_classes:
+  equipment_system: "机组、锅炉、汽轮机、发电机等系统级对象"
+  equipment_component: "阀门、轴承、管束、燃烧器等可定位部件"
+  material_or_medium: "材料、工质、油、水、氢气、煤种等"
+  operating_parameter: "温度、压力、振动、流量、液位等参数定义"
+  parameter_observation: "带数值/单位/时间的参数观测"
+  operating_condition: "负荷、启停、环境、运行方式等工况"
+  fault_event: "可定位的故障发生事件"
+  fault_mechanism: "泄漏、腐蚀、磨损、短路、超温等失效机理"
+  fault_symptom: "异常振动、跳闸、温升等可观测现象"
+  protection_action: "MFT、联锁、保护动作、解列等"
+  maintenance_action: "检修、更换、调整、试验等处置动作"
+  diagnostic_method: "检测、试验、诊断算法、检查方法"
+  safety_requirement: "标准、规程、阈值、管理要求"
+  location: "厂站、系统位置、设备层级位置"
+  document_source: "报告、规程、通报、手册等可追溯文档"
+  evidence_span: "文档内可定位的证据片段"
+  technical_concept: "无法可靠归入上述类别的技术概念"
+
+relation_classes:
+  part_of: [equipment_component, equipment_system, equipment_component, equipment_system]
+  has_material: [equipment_component, equipment_system, material_or_medium, material_or_medium]
+  has_parameter: [equipment_component, equipment_system, operating_parameter, operating_parameter]
+  observed_as: [operating_parameter, fault_event, parameter_observation, fault_symptom]
+  occurs_under: [fault_event, parameter_observation, operating_condition, operating_condition]
+  occurs_at: [fault_event, equipment_component, location, equipment_component]
+  has_mechanism: [fault_event, equipment_component, fault_mechanism, fault_mechanism]
+  manifests_as: [fault_event, fault_mechanism, fault_symptom, fault_symptom]
+  causes: [fault_event, fault_mechanism, fault_event, fault_symptom]
+  affects: [fault_event, fault_mechanism, equipment_component, operating_parameter]
+  escalates_to: [fault_event, fault_symptom, fault_event, protection_action]
+  triggers: [fault_event, fault_symptom, protection_action, protection_action]
+  mitigated_by: [fault_event, fault_symptom, maintenance_action, maintenance_action]
+  diagnosed_by: [fault_event, fault_symptom, diagnostic_method, diagnostic_method]
+  requires: [maintenance_action, diagnostic_method, material_or_medium, safety_requirement]
+  governed_by: [maintenance_action, equipment_system, safety_requirement, safety_requirement]
+  prevents: [maintenance_action, safety_requirement, fault_event, fault_mechanism]
+  supported_by: [fault_event, fault_symptom, evidence_span, evidence_span]
+  extracted_from: [evidence_span, technical_concept, document_source, document_source]
+  has_evidence: [technical_concept, fault_event, evidence_span, evidence_span]
+
+legacy_crosswalk:
+  entity_type:
+    设备类型: [equipment_system, equipment_component]
+    部件名称: [equipment_component]
+    核心指标: [operating_parameter, parameter_observation, technical_concept]
+    故障现象: [fault_symptom, fault_event]
+    故障原因: [fault_mechanism, operating_condition]
+    故障名称: [fault_event, fault_mechanism]
+    处理方案: [maintenance_action]
+    诊断方法: [diagnostic_method]
+    安全规范: [safety_requirement]
+    材料: [material_or_medium]
+    预防措施: [maintenance_action, safety_requirement]
+  relation_type:
+    包含: [part_of, has_parameter, has_material]
+    影响: [affects, causes]
+    导致: [causes, escalates_to, triggers]
+    引起: [causes, triggers]
+    表现为: [manifests_as, observed_as]
+    采用: [mitigated_by, diagnosed_by]
+    需要: [requires]
+    用于: [diagnosed_by, mitigated_by]
+    预防: [prevents]
+    属于: [part_of]
