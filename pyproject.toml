@@ -4,7 +4,6 @@ version = "0.1.0"
 description = "Evidence-constrained multi-agent GraphRAG for auditable technical incident analysis"
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
-license = {text = "MIT"}
 dependencies = [
     "httpx>=0.28.0",
     "pydantic>=2.0.0",
