@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0",
+  "scope": "Template-conformance and evidence-isolation evaluation; not diagnostic correctness.",
+  "templates": [
+    {
+      "template_id": "incident_brief",
+      "title": "运行事件简报",
+      "required_keys": ["event_observation", "protection_or_operational_response", "reported_consequence", "evidence_boundary"],
+      "forbid_unstated_root_cause": true
+    },
+    {
+      "template_id": "evidence_review",
+      "title": "证据审查与诊断建议",
+      "required_keys": ["evidence_summary", "supported_causal_statement", "uncertainty_and_scope", "verification_or_action_request"],
+      "forbid_unstated_root_cause": true
+    },
+    {
+      "template_id": "operational_handoff",
+      "title": "运行交接与复核清单",
+      "required_keys": ["confirmed_facts", "open_questions", "recommended_next_check", "evidence_boundary"],
+      "forbid_unstated_root_cause": true
+    }
+  ]
+}
