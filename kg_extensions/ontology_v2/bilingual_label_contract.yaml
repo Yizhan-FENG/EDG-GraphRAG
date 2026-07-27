@@ -1,0 +1,44 @@
+version: "1.0.0-draft"
+purpose: >-
+  Define a language-neutral semantic-label layer for an English journal paper
+  while retaining Chinese source evidence and the legacy Chinese graph.
+principles:
+  - "Chinese source text and evidence spans are immutable provenance, not translation targets."
+  - "Evaluation and graph identity use canonical_id and ontology identifiers, never a surface label alone."
+  - "Semantic remapping precedes English translation: ambiguous legacy types must not be translated blindly."
+  - "Any machine translation is a candidate label and must retain method, confidence, reviewer status, and timestamp."
+
+canonical_node_fields:
+  canonical_id:
+    description: "Stable deterministic identifier; independent of Chinese/English surface wording."
+    required: true
+  ontology_class:
+    description: "Final v2 ontology class after contextual remapping."
+    required: false
+  label_zh:
+    description: "Original Chinese label from the legacy graph."
+    required: true
+  label_en:
+    description: "English preferred label for paper-facing display and querying."
+    required: false
+  aliases_zh: {required: false}
+  aliases_en: {required: false}
+  source_language: {allowed: [zh, en, mixed], required: true}
+  translation:
+    fields: [status, method, confidence, reviewer_status, reviewed_at]
+  provenance:
+    fields: [legacy_types, source_document_count, source_document_examples]
+
+translation_statuses:
+  pending_after_semantic_remap: "No English candidate is generated until class ambiguity is resolved."
+  candidate_machine_translation: "Candidate only; never treated as expert gold."
+  reviewed: "Terminology and class have been reviewed against source context."
+  not_required: "Language-neutral identifier is sufficient for the intended evaluation."
+
+minimum_publication_export:
+  - canonical_id
+  - ontology_class
+  - label_en
+  - label_zh
+  - translation.status
+  - provenance.source_document_examples
